@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
+build-backend = "hatchling.build"
+
+[project]
+name = "httpx_kerberos"
+description = "Kerberos authentication for HTTPX"
+license = "MIT"
+requires-python = ">=3.8,<4.0"
+authors = [
+    { name = "Chris Newville", email = "christopher.newville@hyprxa.io" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+dependencies = [
+    "cryptography",
+    "httpx",
+    "pyspnego",
+]
+dynamic = ["readme", "version"]
+
+
+[project.urls]
+Changelog = "https://github.com/hyprxa/httpx_kerberos/blob/master/CHANGELOG.md"
+Homepage = "https://github.com/hyprxa/httpx_kerberos"
+Source = "https://github.com/hyprxa/httpx_kerberos"
+
+[tool.hatch.version]
+path = "./httpx_kerberos/__version__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/httpx_kerberos",
+    "/CHANGELOG.md",
+    "/README.md",
+]
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = "\n## Release Information\n\n"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "CHANGELOG.md"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = "\n---\n\n[Full changelog](https://github.com/hyprxa/httpx_kerberos/blob/master/CHANGELOG.md)\n"
