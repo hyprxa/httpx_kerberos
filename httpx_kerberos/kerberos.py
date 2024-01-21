@@ -8,7 +8,7 @@ import warnings
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING
 
 import spnego
 import spnego.channel_bindings
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 _LOGGER = logging.getLogger("kerberos")
-_cached_certs: dict[str, CachedCert] = {}
+_cached_certs: Dict[str, CachedCert] = {}
 _pattern = re.compile(r"Negotiate\s*([^,]*)", re.I)
 
 
