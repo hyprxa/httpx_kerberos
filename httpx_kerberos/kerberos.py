@@ -6,7 +6,7 @@ import re
 import ssl
 import warnings
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import IntEnum
 from typing import Dict, TYPE_CHECKING
 
@@ -45,7 +45,7 @@ class CachedCert:
 
     @property
     def expired(self) -> bool:
-        return datetime.utcnow() >= self.cert.not_valid_after
+        return datetime.now(tz=timezone.utc) >= self.cert.not_valid_after
 
 
 class MutualAuthentication(IntEnum):
