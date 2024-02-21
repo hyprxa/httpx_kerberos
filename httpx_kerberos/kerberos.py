@@ -45,7 +45,7 @@ class CachedCert:
 
     @property
     def expired(self) -> bool:
-        return datetime.now(tz=timezone.utc) >= self.cert.not_valid_after
+        return datetime.now(tz=timezone.utc) >= self.cert.not_valid_after_utc
 
 
 class MutualAuthentication(IntEnum):
@@ -117,7 +117,7 @@ def get_certificate_hash(
     return certificate_hash
 
 
-def get_channel_bindings_application_data(response: Response) -> bytes | None:
+def get_channel_bindings_application_data(response: Response) -> tuple[x509.Certificate, bytes] | tuple[None, None]:
     """https://tools.ietf.org/html/rfc5929 4. The 'tls-server-end-point' Channel
     Binding Type.
 
@@ -128,26 +128,13 @@ def get_channel_bindings_application_data(response: Response) -> bytes | None:
     socket or the raw HTTP object is not a urllib3 HTTPResponse then `None` will
     be returned and the Kerberos auth will use GSS_C_NO_CHANNEL_BINDINGS.
     """
-    application_data = None
-
     scheme = response.url.scheme.lower()
     host = response.url.host
     port = response.url.port
     if not port:
         port = 443 if scheme == "https" else 80
     if scheme != "https":
-        return application_data
-
-    cached_cert = _cached_certs.get(host)
-    if cached_cert is not None and not cached_cert.expired:
-        return cached_cert.application_data
-    elif cached_cert is not None and cached_cert.expired:
-        _LOGGER.info(
-            "Discarding cached SSL certificate at %s:%i. Certificate is expired",
-            host,
-            port,
-        )
-        _cached_certs.pop(host)
+        return None, None
 
     _LOGGER.debug("Retrieving SSL certificate at %s:%i", host, port)
     try:
@@ -160,17 +147,16 @@ def get_channel_bindings_application_data(response: Response) -> bytes | None:
             f"Unable to retrieve SSL certificate at {host}:{port}",
             NoCertificateRetrievedWarning,
         )
-        return application_data
+        return None, None
 
     certificate_der = ssl.PEM_cert_to_DER_cert(certificate_pem)
     cert = x509.load_der_x509_certificate(certificate_der, default_backend())
     certificate_hash = get_certificate_hash(cert, certificate_der)
     if certificate_hash is not None:
         application_data = b"tls-server-end-point:" + certificate_hash
-        cached_cert = CachedCert(cert, application_data)
-        _cached_certs[host] = cached_cert
-
-    return application_data
+        return cert, application_data
+    
+    return None, None
 
 
 class HTTPKerberosAuth(Auth):
@@ -210,15 +196,37 @@ class HTTPKerberosAuth(Auth):
 
         # check if we have already tried to get the CBT data value
         if self.send_cbt:
+            scheme = request.url.scheme.lower()
             host = request.url.host
-            # ff we haven't tried, try getting it now
+            port = request.url.port
+            if not port:
+                port = 443 if scheme == "https" else 80
+            
+            cached_cert = _cached_certs.get(host)
+            if cached_cert is not None and not cached_cert.expired:
+                _LOGGER.debug("Cached cert hit at %s:%i", host, port)
+                assert host in self._cbts
+            elif cached_cert is not None and cached_cert.expired:
+                _LOGGER.info(
+                    "Discarding cached SSL certificate at %s:%i. Certificate is expired",
+                    host,
+                    port,
+                )
+                assert host in self._cbts
+                _cached_certs.pop(host)
+                self._cbts.pop(host)
+            
             if host not in self._cbts:
-                cbt_application_data = get_channel_bindings_application_data(response)
-                if cbt_application_data:
+                cert, application_data = get_channel_bindings_application_data(response)
+                if cert:
+                    assert application_data
+                    cached_cert = CachedCert(cert, application_data)
+                    _cached_certs[host] = cached_cert
                     self._cbts[host] = spnego.channel_bindings.GssChannelBindings(
-                        application_data=cbt_application_data,
+                        application_data=application_data,
                     )
                 else:
+                    assert not application_data
                     # store None so we don't waste time next time
                     self._cbts[host] = None
 
