@@ -11,7 +11,7 @@ authors = [
     { name = "Chris Newville", email = "christopher.newville@hyprxa.io" },
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -24,15 +24,14 @@ classifiers = [
     "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
-    "cryptography",
-    "httpx",
-    "pyspnego",
+    "cryptography>=42.0.0",
+    "httpx>=0.25.0,<1.0.0",
+    "pyspnego>=0.10.2",
 ]
 dynamic = ["readme", "version"]
 
 
 [project.urls]
-Changelog = "https://github.com/hyprxa/httpx_kerberos/blob/master/CHANGELOG.md"
 Homepage = "https://github.com/hyprxa/httpx_kerberos"
 Source = "https://github.com/hyprxa/httpx_kerberos"
 
@@ -42,7 +41,6 @@ path = "./httpx_kerberos/__version__.py"
 [tool.hatch.build.targets.sdist]
 include = [
     "/httpx_kerberos",
-    "/CHANGELOG.md",
     "/README.md",
 ]
 
@@ -51,12 +49,3 @@ content-type = "text/markdown"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
-
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-text = "\n## Release Information\n\n"
-
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-path = "CHANGELOG.md"
-
-[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
-text = "\n---\n\n[Full changelog](https://github.com/hyprxa/httpx_kerberos/blob/master/CHANGELOG.md)\n"
