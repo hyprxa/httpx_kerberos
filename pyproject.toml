@@ -26,7 +26,8 @@ classifiers = [
 dependencies = [
     "cryptography>=42.0.0",
     "httpx>=0.25.0,<1.0.0",
-    "pyspnego>=0.10.2",
+    "pyspnego>=0.10.2; sys_platform == 'win32'",
+    "pyspnego[kerberos]>=0.10.2; sys_platform != 'win32'",
 ]
 dynamic = ["readme", "version"]
 
