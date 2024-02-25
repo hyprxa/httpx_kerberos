@@ -13,7 +13,10 @@ authentication. Basic GET usage:
 Setup
 -----
 
-In order to use this library, there must already be a Kerberos Ticket-Granting
+On Windows, no additional setup is required. The package will use SSPI and select
+the Kerberos SSP under the hood.
+
+In order to use this library on Linux, there must already be a Kerberos Ticket-Granting
 Ticket(TGT) cached in a Kerberos credential cache. Whether a TGT is available
 can be easily determined by running the ``klist`` command. If no TGT is
 available, then it first must be obtained by running the ``kinit`` command, or
