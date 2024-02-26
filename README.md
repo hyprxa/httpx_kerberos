@@ -40,7 +40,7 @@ Mutual Authentication
 
 By default, ``HTTPKerberosAuth`` will require mutual authentication from the
 server, and if a server emits a non-error response which cannot be
-authenticated, a ``httpx_kerberos.errors.MutualAuthenticationError`` will
+authenticated, a ``httpx_kerberos.exceptions.MutualAuthenticationError`` will
 be raised. If a server emits an error which cannot be authenticated, it will
 be returned to the user but with its contents and headers stripped. If the
 response content is more important than the need for mutual auth on errors,
