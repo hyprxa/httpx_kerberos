@@ -58,8 +58,6 @@ setting ``sanitize_mutual_error_response=False``:
 If you'd prefer to not require mutual authentication, you can set your
 preference when constructing your ``HTTPKerberosAuth`` object:
 
-.. code-block:: python
-
     >>> import httpx
     >>> from httpx_kerberos import HTTPKerberosAuth, MutualAuthentication
     >>> kerberos_auth = HTTPKerberosAuth(mutual_authentication=MutualAuthentication.OPTIONAL)
