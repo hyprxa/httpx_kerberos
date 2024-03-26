@@ -104,8 +104,6 @@ This feature depends on OS support for collection-type credential caches,
 as well as working principal support in PyKerberos (it is broken in many
 builds). An explicit principal can be specified with the ``principal`` arg:
 
-.. code-block:: python
-
     >>> import httpx
     >>> from httpx_kerberos import HTTPKerberosAuth
     >>> kerberos_auth = HTTPKerberosAuth(principal="user@REALM")
